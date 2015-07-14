@@ -1,0 +1,107 @@
+body {
+	background-color: #84C4B2;
+	font: 12px Arial, Helvetica, sans-serif;
+	color: #5E5E5E;
+}
+#products-wrapper {
+	width: 800px;
+	margin-right: auto;
+	margin-left: auto;
+}
+.products {
+	width: 60%;
+	float:left;
+	margin-right: 10px;
+}
+.product {
+	margin-bottom: 10px;
+	height: 100px;
+	background: #FFF;
+	padding: 15px;
+	min-height: 120px
+}
+.product .product-thumb {
+	float: left;
+	height: 100px;
+	width: 100px;
+	margin-right: 10px;
+}
+.product .product-content{
+	overflow:hidden;
+}
+.product .product-content h3 {
+	font: 18px "Trebuchet MS", Arial;
+	margin: 0px;
+	padding: 0px;
+}
+.product .product-info {
+	float: right;
+	font-size: 13px;
+	font-weight: bold;
+	margin-top:10px;
+}
+
+/*** shopping cart **/
+.shopping-cart{
+	width: 30%;
+	float: left;
+	background: #FFF;
+	padding: 10px;
+}
+.shopping-cart h2 {
+	background: #F0F7F2;
+	padding: 8px;
+	margin: -10px -10px 5px;
+	font: 18px "Trebuchet MS", Arial;
+}
+
+.shopping-cart h3,.view-cart h3 {
+	font-size: 12px;
+	margin: 0px;
+	padding: 0px;
+}
+.shopping-cart ol{
+	padding: 1px 0px 0px 15px;
+}
+.shopping-cart .cart-itm, .view-cart .cart-itm{
+	border-bottom: 1px solid #DDD;
+	font-size: 11px;
+	font-family: arial;
+	margin-bottom: 5px;
+	padding-bottom: 5px;
+}
+.shopping-cart .remove-itm, .view-cart .remove-itm{
+	font-size: 14px;
+	float: right;
+	background: #F2F8F7;
+	padding: 4px;
+	line-height: 8px;
+	border-radius: 3px;
+}
+.shopping-cart .remove-itm:hover, .view-cart .remove-itm:hover{
+	background: #C4C4C4;
+}
+.shopping-cart .remove-itm a, .view-cart .remove-itm a{
+	color: #C4C4C4;
+	text-shadow: 1px 1px 1px #ECECEC;
+	text-decoration:none;
+}
+
+.check-out-txt{
+	float:right;
+}
+
+/*** view cart **/
+.view-cart {
+	width: 100%;
+	float: left;
+	background: #FFF;
+	padding: 10px;
+}
+.view-cart .p-price{
+	float: right;
+	margin-right: 10px;
+	font-size: 12px;
+	font-weight: bold;
+}
+.view-cart .product-info{width:60%;}
