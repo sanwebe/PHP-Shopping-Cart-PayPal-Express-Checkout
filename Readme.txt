@@ -4,4 +4,4 @@ Shopping Cart with PayPal Express checkout
 2. Change settings in "config.php" for both PayPal and database.
 3. Navigate to index page of your shopping cart and enjoy.
 
-@download from http://www.sanwebe.com
+@download from http://www.sanwebe.com/2013/07/php-multiple-items-shopping-cart-integration-with-paypal
