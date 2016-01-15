@@ -5,14 +5,9 @@ include_once("paypal.class.php");
 
 $paypalmode = ($PayPalMode=='sandbox') ? '.sandbox' : '';
 
-if($_POST) //Post Data received from product list page.
+if(isset($_SESSION["cart_products"])) //Post Data received from product list page.
 {
 	//Other important variables like tax, shipping cost
-	$TotalTaxAmount 	= 2.58;  //Sum of tax for all items in this order. 
-	$HandalingCost 		= 2.00;  //Handling cost for this order.
-	$InsuranceCost 		= 1.00;  //shipping insurance cost for this order.
-	$ShippinDiscount 	= -3.00; //Shipping discount for this order. Specify this as negative number.
-	$ShippinCost 		= 3.00; //Although you may change the value later, try to pass in a shipping amount that is reasonably accurate.
 
 	//we need 4 variables from product page Item Name, Item Price, Item Number and Item Quantity.
 	//Please Note : People can manipulate hidden field amounts in form,
@@ -20,21 +15,21 @@ if($_POST) //Post Data received from product list page.
 	//eg : $ItemPrice = $mysqli->query("SELECT item_price FROM products WHERE id = Product_Number");
 	$paypal_data ='';
 	$ItemTotalPrice = 0;
-	
-    foreach($_POST['item_name'] as $key=>$itmname)
-    {
-        $product_code 	= filter_var($_POST['item_code'][$key], FILTER_SANITIZE_STRING); 
+	$i = 0;
+		foreach ($_SESSION["cart_products"] as $cart_itm)
+        {
+        $product_code 	= filter_var($cart_itm["product_code"], FILTER_SANITIZE_STRING); 
 		
 		$results = $mysqli->query("SELECT product_name, product_desc, price FROM products WHERE product_code='$product_code' LIMIT 1");
 		$obj = $results->fetch_object();
 		
-        $paypal_data .= '&L_PAYMENTREQUEST_0_NAME'.$key.'='.urlencode($obj->product_name);
-        $paypal_data .= '&L_PAYMENTREQUEST_0_NUMBER'.$key.'='.urlencode($_POST['item_code'][$key]);
-        $paypal_data .= '&L_PAYMENTREQUEST_0_AMT'.$key.'='.urlencode($obj->price);		
-		$paypal_data .= '&L_PAYMENTREQUEST_0_QTY'.$key.'='. urlencode($_POST['item_qty'][$key]);
+        $paypal_data .= '&L_PAYMENTREQUEST_0_NAME'.$i.'='.urlencode($obj->product_name);
+        $paypal_data .= '&L_PAYMENTREQUEST_0_NUMBER'.$i.'='.urlencode($cart_itm["product_code"]);
+        $paypal_data .= '&L_PAYMENTREQUEST_0_AMT'.$i.'='.urlencode($obj->price);		
+		$paypal_data .= '&L_PAYMENTREQUEST_0_QTY'.$i.'='. urlencode($cart_itm["product_qty"]);
         
 		// item price X quantity
-        $subtotal = ($obj->price*$_POST['item_qty'][$key]);
+        $subtotal = ($obj->price*$cart_itm["product_qty"]);
 		
         //total price
         $ItemTotalPrice = $ItemTotalPrice + $subtotal;
@@ -42,20 +37,28 @@ if($_POST) //Post Data received from product list page.
 		//create items for session
 		$paypal_product['items'][] = array('itm_name'=>$obj->product_name,
 											'itm_price'=>$obj->price,
-											'itm_code'=>$_POST['item_code'][$key], 
-											'itm_qty'=>$_POST['item_qty'][$key]
+											'itm_code'=>$cart_itm["product_code"], 
+											'itm_qty'=>$cart_itm["product_qty"]
 											);
+		$i++;
     }
+	
+	$total_tax = 0;	
+	foreach($taxes as $key => $value){ //list and calculate all taxes in array
+			$tax_amount     = round($ItemTotalPrice * ($value / 100));
+			$tax_item[$key] = $tax_amount;
+			$total_tax = $total_tax + $tax_amount; //total tax amount
+	}
 				
 	//Grand total including all tax, insurance, shipping cost and discount
-	$GrandTotal = ($ItemTotalPrice + $TotalTaxAmount + $HandalingCost + $InsuranceCost + $ShippinCost + $ShippinDiscount);
+	$GrandTotal = ($ItemTotalPrice + $total_tax + $HandalingCost + $InsuranceCost + $shipping_cost + $ShippinDiscount);
 	
 								
-	$paypal_product['assets'] = array('tax_total'=>$TotalTaxAmount, 
+	$paypal_product['assets'] = array('tax_total'=>$total_tax, 
 								'handaling_cost'=>$HandalingCost, 
 								'insurance_cost'=>$InsuranceCost,
 								'shippin_discount'=>$ShippinDiscount,
-								'shippin_cost'=>$ShippinCost,
+								'shippin_cost'=>$shipping_cost,
 								'grand_total'=>$GrandTotal);
 	
 	//create session array for later use
@@ -69,8 +72,8 @@ if($_POST) //Post Data received from product list page.
 				$paypal_data.				
 				'&NOSHIPPING=0'. //set 1 to hide buyer's shipping address, in-case products that does not require shipping
 				'&PAYMENTREQUEST_0_ITEMAMT='.urlencode($ItemTotalPrice).
-				'&PAYMENTREQUEST_0_TAXAMT='.urlencode($TotalTaxAmount).
-				'&PAYMENTREQUEST_0_SHIPPINGAMT='.urlencode($ShippinCost).
+				'&PAYMENTREQUEST_0_TAXAMT='.urlencode($total_tax).
+				'&PAYMENTREQUEST_0_SHIPPINGAMT='.urlencode($shipping_cost).
 				'&PAYMENTREQUEST_0_HANDLINGAMT='.urlencode($HandalingCost).
 				'&PAYMENTREQUEST_0_SHIPDISCAMT='.urlencode($ShippinDiscount).
 				'&PAYMENTREQUEST_0_INSURANCEAMT='.urlencode($InsuranceCost).
