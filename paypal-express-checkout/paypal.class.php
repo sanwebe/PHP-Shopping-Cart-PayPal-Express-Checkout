@@ -20,7 +20,8 @@ class MyPayPal {
 			// Turn off the server and peer verification (TrustManager Concept).
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		
+			curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'TLSv1'); //comment out incase of NSS instead of OpenSSL
+			
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_POST, 1);
 		
